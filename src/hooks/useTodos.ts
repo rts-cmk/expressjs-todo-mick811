@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-const API_URL = 'http://localhost:3000/todos';
 
 export function useTodos() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const fetchTodos = useCallback(() => {
-    axios.get<Todo[]>(API_URL)
+    axios.get<Todo[]>(`${import.meta.env.VITE_API_ENDPOINT}/todos`)
       .then(res => {
         setTodos(res.data);
         setError(null);
@@ -24,7 +23,7 @@ export function useTodos() {
 
   const createTodo = (title: string) => {
     if (!title.trim()) return;
-    axios.post(API_URL, { title: title.trim(), completed: false })
+    axios.post(`${import.meta.env.VITE_API_ENDPOINT}/todos`, { title: title.trim(), completed: false })
       .then(() => fetchTodos())
       .catch(err => {
         console.error('Failed to create todo:', err);
@@ -33,7 +32,7 @@ export function useTodos() {
   };
 
   const updateTodo = (id: number, updates: Partial<Todo>) => {
-    axios.put(`${API_URL}/${id}`, updates)
+    axios.put(`${import.meta.env.VITE_API_ENDPOINT}/todos/${id}`, updates)
       .then(() => fetchTodos())
       .catch(err => {
         console.error('Failed to update todo:', err);
@@ -42,7 +41,7 @@ export function useTodos() {
   };
 
   const deleteTodo = (id: number) => {
-    axios.delete(`${API_URL}/${id}`)
+    axios.delete(`${import.meta.env.VITE_API_ENDPOINT}/todos/${id}`)
       .then(() => fetchTodos())
       .catch(err => {
         console.error('Failed to delete todo:', err);
