@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from 'react';
+import { useState, memo, type KeyboardEvent } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -8,7 +8,7 @@ interface TodoItemProps {
   onDelete: (id: number) => void;
 }
 
-export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
+export const TodoItem = memo(function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editingTitle, setEditingTitle] = useState(todo.title);
 
@@ -99,4 +99,4 @@ export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
       </button>
     </li>
   );
-}
+});

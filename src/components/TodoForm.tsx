@@ -1,30 +1,51 @@
-import { useState, type FormEvent } from 'react';
+import { useRef } from 'react';
 
 interface TodoFormProps {
-  onSubmit: (title: string) => void;
+  onSubmit: (title: string) => Promise<void>;
+  disabled?: boolean;
 }
 
-export function TodoForm({ onSubmit }: TodoFormProps) {
-  const [newTodoTitle, setNewTodoTitle] = useState('');
+export function TodoForm({ onSubmit, disabled }: TodoFormProps) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newTodoTitle.trim()) {
-      onSubmit(newTodoTitle);
-      setNewTodoTitle('');
-    }
+    if (disabled) return;
+
+    const formData = new FormData(formRef.current!);
+    const title = formData.get('title') as string;
+
+    if (!title.trim()) return;
+
+    await onSubmit(title);
+    formRef.current?.reset();
+    inputRef.current?.focus();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="todo-form">
+    <form 
+      ref={formRef}
+      onSubmit={handleSubmit}
+      className="todo-form"
+    >
       <input
+        ref={inputRef}
         type="text"
-        value={newTodoTitle}
-        onChange={(e) => setNewTodoTitle(e.target.value)}
-        placeholder="Add a new todo..."
+        name="title"
+        placeholder="What needs to be done?"
         className="todo-input"
+        required
+        autoComplete="off"
+        disabled={disabled}
       />
-      <button type="submit" className="btn btn-primary">Add</button>
+      <button 
+        type="submit" 
+        disabled={disabled}
+        className="btn btn-primary"
+      >
+        {disabled ? 'Adding...' : 'Add'}
+      </button>
     </form>
   );
 }

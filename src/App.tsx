@@ -3,14 +3,30 @@ import { TodoForm } from './components/TodoForm';
 import { TodoList } from './components/TodoList';
 
 export default function App() {
-  const { todos, createTodo, updateTodo, deleteTodo, reorderTodos, error } = useTodos();
+  const { 
+    todos, 
+    isLoading, 
+    error, 
+    addTodo, 
+    updateTodo, 
+    deleteTodo, 
+    reorderTodos 
+  } = useTodos();
 
   return (
     <div className="app">
       <h1>Todo List</h1>
-      {error && <div className="error-message">{error}</div>}
       
-      <TodoForm onSubmit={createTodo} />
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+      
+      <TodoForm 
+        onSubmit={addTodo} 
+        disabled={isLoading} 
+      />
       
       <TodoList 
         todos={todos} 
