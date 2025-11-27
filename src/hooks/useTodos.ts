@@ -49,12 +49,23 @@ export function useTodos() {
       });
   };
 
+  const reorderTodos = (newTodos: Todo[]) => {
+    setTodos(newTodos); // optimistically update the todos
+    axios.put(`${import.meta.env.VITE_API_ENDPOINT}/todos`, newTodos)
+      .catch(err => {
+        console.error('Failed to reorder todos:', err);
+        setError('Failed to reorder todos');
+        fetchTodos(); // revert on error
+      });
+  };
+
   return {
     todos,
     error,
     createTodo,
     updateTodo,
     deleteTodo,
+    reorderTodos,
     refreshTodos: fetchTodos,
   };
 }

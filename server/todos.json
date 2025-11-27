@@ -1,10 +1,4 @@
 {
-  "lastId": 1,
-  "todos": [
-    {
-      "id": 1,
-      "title": "hello world",
-      "completed": false
-    }
-  ]
+  "lastId": 2,
+  "todos": []
 }

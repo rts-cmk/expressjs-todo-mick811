@@ -3,7 +3,7 @@ import { TodoForm } from './components/TodoForm';
 import { TodoList } from './components/TodoList';
 
 export default function App() {
-  const { todos, createTodo, updateTodo, deleteTodo, error } = useTodos();
+  const { todos, createTodo, updateTodo, deleteTodo, reorderTodos, error } = useTodos();
 
   return (
     <div className="app">
@@ -15,7 +15,8 @@ export default function App() {
       <TodoList 
         todos={todos} 
         onUpdate={updateTodo} 
-        onDelete={deleteTodo} 
+        onDelete={deleteTodo}
+        onReorder={reorderTodos}
       />
     </div>
   );

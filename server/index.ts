@@ -45,6 +45,32 @@ app.get("/todos/:id", (req, res) => {
   });
 });
 
+app.put("/todos", (req, res) => {
+  const newTodos = req.body;
+
+  if (!Array.isArray(newTodos)) {
+    return res.status(400).json({ error: "expected an array of todos" });
+  }
+
+  fs.readFile("todos.json", "utf-8", (err, data) => {
+    if (err) return res.status(500).json({ error: "failed to read todos" });
+
+    const fileData = JSON.parse(data) as {
+      lastId: number;
+      todos: Todo[];
+    };
+
+    // Replace the todos array with the new one
+    // Ideally we should validate that the IDs match existing ones, but for now we trust the client for reordering
+    fileData.todos = newTodos;
+
+    fs.writeFile("todos.json", JSON.stringify(fileData, null, 2), (err) => {
+      if (err) return res.status(500).json({ error: "failed to save todos" });
+      res.json(newTodos);
+    });
+  });
+});
+
 app.post("/todos", (req, res) => {
   const { title, completed } = req.body;
 
