@@ -59,10 +59,10 @@ app.post("/todos", (req, res) => {
     // increment the last id to generate a unique id
     const newId = fileData.lastId + 1;
 
-    const newTodo = {
+    const newTodo: Todo = {
       id: newId,
       title,
-      completed: completed ?? false,
+      completed: completed,
     };
 
     fileData.todos.push(newTodo);
