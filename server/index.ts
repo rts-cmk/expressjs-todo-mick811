@@ -8,16 +8,23 @@ app.use(cors());
 
 const port = 3000;
 
+interface Todo {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
 app.get("/", (req, res) => {
   res.json({
     message: "welcome to the todos api",
   })
 });
 
-app.get("/todos", (req, res) => {
+app.get("/todos", (_, res) => {
   fs.readFile("todos.json", "utf-8", (err, data) => {
     if (err) return res.status(500).json({ error: "failed to read todos" });
 
+    // Parse the JSON string into a JavaScript object
     const fileData = JSON.parse(data);
     res.json(fileData.todos);
   });
@@ -30,7 +37,7 @@ app.get("/todos/:id", (req, res) => {
     if (err) return res.status(500).json({ error: "failed to read todos" });
 
     const fileData = JSON.parse(data);
-    const todo = fileData.todos.find((t: any) => t.id.toString() === id);
+    const todo = fileData.todos.find((t: Todo) => t.id.toString() === id);
 
     if (!todo) return res.status(404).json({ error: "todo not found" });
 
@@ -46,9 +53,10 @@ app.post("/todos", (req, res) => {
 
     const fileData = JSON.parse(data) as {
       lastId: number;
-      todos: Record<string, any>[];
+      todos: Todo[];
     };
 
+    // increment the last id to generate a unique id
     const newId = fileData.lastId + 1;
 
     const newTodo = {
@@ -60,6 +68,7 @@ app.post("/todos", (req, res) => {
     fileData.todos.push(newTodo);
     fileData.lastId = newId;
 
+    // save with 2-space indentation for readability
     fs.writeFile("todos.json", JSON.stringify(fileData, null, 2), (err) => {
       if (err) return res.status(500).json({ error: "failed to save todo" });
 
@@ -77,10 +86,10 @@ app.put("/todos/:id", (req, res) => {
 
     const fileData = JSON.parse(data) as {
       lastId: number;
-      todos: Record<string, any>[];
+      todos: Todo[];
     };
 
-    const todoIndex = fileData.todos.findIndex((t: any) => t.id.toString() === id);
+    const todoIndex = fileData.todos.findIndex((t: Todo) => t.id.toString() === id);
 
     if (todoIndex === -1) {
       return res.status(404).json({ error: "todo not found" });
@@ -88,6 +97,7 @@ app.put("/todos/:id", (req, res) => {
 
     const oldTodo = fileData.todos[todoIndex]!; 
 
+    // merge existing todo with updates
     const updatedTodo = {
       ...oldTodo,
       title: title ?? oldTodo.title,
@@ -112,15 +122,19 @@ app.delete("/todos/:id", (req, res) => {
 
     const fileData = JSON.parse(data) as {
       lastId: number;
-      todos: Record<string, any>[];
+      todos: Todo[];
     };
 
-    const todoIndex = fileData.todos.findIndex((t: any) => t.id.toString() === id);
+    // findIndex returns the array position (0, 1, 2...) where the object with matching id is located
+    // note: this is different from the object's 'id' property (5, 6, 7...)
+    const todoIndex = fileData.todos.findIndex((t: Todo) => t.id.toString() === id);
 
     if (todoIndex === -1) {
       return res.status(404).json({ error: "todo not found" });
     }
 
+    // splice(todoIndex, 1) removes 1 array element starting at todoIndex
+    // the '1' means "remove 1 element" in this case, the entire object at todoIndex
     fileData.todos.splice(todoIndex, 1);
 
     fs.writeFile("todos.json", JSON.stringify(fileData, null, 2), (err) => {
@@ -135,4 +149,3 @@ app.listen(port, (err) => {
   if (err) return console.error(err);
   console.log(`server is running at http://localhost:${port}`);
 });
-
